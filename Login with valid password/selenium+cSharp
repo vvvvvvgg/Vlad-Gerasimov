@@ -1,0 +1,68 @@
+using System;
+using System.Threading;
+using NUnit.Framework;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support.UI;
+
+namespace csharp_example
+{
+    [TestFixture]
+    public class UnitTest1
+    {
+        private IWebDriver driver;
+        private WebDriverWait wait;
+
+        [SetUp]
+        public void Start()
+        {
+            driver = new ChromeDriver();
+            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+        }
+        [Test]
+        public void FirstTest()
+        {
+            driver.Url = "https://test-jpclive.egamings.com/";
+
+            StalennesOfCurrentElement("[class='wlc-main-loader']", 2);
+            driver.FindElement(By.CssSelector("[data-wlc-element='button_login-modal']")).Click();
+            driver.FindElement(By.CssSelector("[data-wlc-element='input_email-login']")).SendKeys("vgerasimov1111+eur@gmail.com");
+            driver.FindElement(By.CssSelector("[data-wlc-element='input_password']")).SendKeys("Casino123");
+            driver.FindElement(By.CssSelector("[data-wlc-element='button_login-submit']")).Click();
+            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.CssSelector("[data-wlc-element='button_add']")));                        
+        }
+        
+        // Цикл если лоадер не одинарный
+        private void StalennesOfCurrentElement(string cssSelector, int countTry = 1)
+        {
+            int i = 1;
+            while (true && i <= countTry)
+            {
+                wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.StalenessOf(driver.FindElement(By.CssSelector(cssSelector))));
+                Thread.Sleep(200);
+                var els = driver.FindElements(By.CssSelector(cssSelector));
+                if (els.Count > 0)
+                {
+                    if (i == countTry)
+                    {
+                        Assert.Fail("Ne zagruzilsa");
+                    }
+                    else
+                    {
+                        i++;
+                    }
+                }
+                else
+                    break;
+            }
+        }
+
+        [TearDown]
+        public void Stop()
+        {
+            driver.Quit();
+            driver = null;
+        }
+
+    }
+}
