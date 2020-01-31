@@ -41,7 +41,7 @@ public class Registr {
         driver.findElement(By.cssSelector("[data-wlc-element=button_register-modal]")).click();
         wait.until(visibilityOf(driver.findElement(By.cssSelector("[data-wlc-element=button_without-bonus]"))));
         driver.findElement(By.cssSelector("[data-wlc-element=button_without-bonus]")).click();
-        driver.findElement(By.cssSelector("[data-wlc-element=input_email]")).sendKeys("vgerasimov1111+1121eur@gmail.com");
+        driver.findElement(By.cssSelector("[data-wlc-element=input_email]")).sendKeys("vgerasimov1111+" + Instant.now().getEpochSecond() + "@gmail.com");
         driver.findElement(By.cssSelector("[data-wlc-element=input_password]")).sendKeys("Casino123");
         WebElement selectElem = driver.findElement(By.cssSelector("[data-wlc-element=select_currency]"));
         select = new Select(selectElem);
