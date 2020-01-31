@@ -1,0 +1,108 @@
+package ru.stga.training.selenium;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.devtools.systeminfo.SystemInfo;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.Select;
+
+
+import java.awt.*;
+import java.util.List;
+import java.util.Properties;
+
+import static org.openqa.selenium.support.ui.ExpectedConditions.*;
+
+
+public class Registr {
+
+    private WebDriver driver;
+    private WebDriverWait wait;
+    private Select select;
+
+    @Before
+    public void start () {
+        driver = new ChromeDriver();
+        wait = new WebDriverWait(driver,10);
+    }
+
+    @Test
+    public void myFirstTest() throws InterruptedException {
+        driver.manage().window().maximize();
+        driver.get("https://test-jpclive.egamings.com/");
+        StalenessOfCurrentElement("[class='wlc-main-loader']");
+        wait.until(visibilityOf(driver.findElement(By.cssSelector("[data-wlc-element=button_register-modal]"))));
+        driver.findElement(By.cssSelector("[data-wlc-element=button_register-modal]")).click();
+        wait.until(visibilityOf(driver.findElement(By.cssSelector("[data-wlc-element=button_without-bonus]"))));
+        driver.findElement(By.cssSelector("[data-wlc-element=button_without-bonus]")).click();
+        driver.findElement(By.cssSelector("[data-wlc-element=input_email]")).sendKeys("vgerasimov1111+1121eur@gmail.com");
+        driver.findElement(By.cssSelector("[data-wlc-element=input_password]")).sendKeys("Casino123");
+        WebElement selectElem = driver.findElement(By.cssSelector("[data-wlc-element=select_currency]"));
+        select = new Select(selectElem);
+        select.selectByValue("EUR");
+
+        if(CheckboxIsSelect("[data-wlc-element='block_rules']"))
+            Assert.assertFalse(Boolean.parseBoolean("Уже нажат"));
+        driver.findElement(By.cssSelector("[data-wlc-element='block_rules'] span")).click();
+
+        if(CheckboxIsSelect("[data-wlc-element='block_age-confirm']"))
+            Assert.assertFalse(Boolean.parseBoolean("уже нажат"));
+        driver.findElement(By.cssSelector("[data-wlc-element='block_age-confirm'] span")).click();
+        Thread.sleep(2000);
+
+        driver.findElement(By.cssSelector("[data-wlc-element='button_register-submit'] ")).click();
+    }
+//нажимаем чекбоксы
+    private boolean CheckboxIsSelect(String cssSelectors) {
+        boolean checked = false;
+
+        WebElement el = driver.findElement(By.cssSelector(cssSelectors));
+        String checkStatus = el.getAttribute("checked");
+        if (checkStatus == "true")
+        {
+            checked = true;
+
+        }
+        else if(checkStatus == "false")
+        {
+        }
+        else
+        {
+            Assert.assertFalse(Boolean.parseBoolean("Ne zagruzilsa"));
+        }
+        return checked;
+    }
+
+
+    // Цикл если лоадер не одинарный
+    private void StalenessOfCurrentElement(String cssSelector) throws InterruptedException {
+        int i = 1;
+        while (true && i <= 2)
+        {
+            wait.until(invisibilityOfElementLocated(By.cssSelector(cssSelector)));
+            Thread.sleep(200);
+            List<WebElement> els = driver.findElements(By.cssSelector("[class='wlc-main-loader']"));
+            if (els.size() > 0) {
+                if (i == 2) {
+                    Assert.assertFalse(Boolean.parseBoolean("Ne zagruzilsa"));
+                } else {
+                    i++;
+                }
+            } else {
+                break;
+            }
+        }
+    }
+        @After
+        public void stop() {
+            driver.quit();
+            driver = null;
+        }
+
+    }
